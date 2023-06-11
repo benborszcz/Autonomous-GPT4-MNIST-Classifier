@@ -14,7 +14,7 @@ class TrainerAgent():
     def clear_messages(self):
         self.messages = []
 
-    def generate_training_action(self, history, hyperparams: dict, thought_message = None, model: str = "gpt-3.5-turbo", temperature: float = 0.1, presence_penalty: float = 0.0, frequency_penalty: float = 0.0, max_tokens: int = 1000):
+    def generate_training_action(self, history, hyperparams: dict, thought_message = None, model: str = "gpt-4", temperature: float = 0.25, presence_penalty: float = 0.0, frequency_penalty: float = 0.0, max_tokens: int = 1000):
         self.add_message("You are an AI model specialized in neural network training, you respond only in the format requested and may only take the actions provided.", role="system")
 
         formatting = ("""
