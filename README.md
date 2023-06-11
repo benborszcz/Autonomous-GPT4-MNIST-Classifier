@@ -2,6 +2,24 @@
 
 This project demonstrates an autonomous GPT-4 MNIST classifier that trains a neural network on the MNIST dataset. The GPT-4 model is used to suggest changes to the hyperparameters of the neural network, aiming to improve its performance.
 
+## Instructions
+
+To use this project, follow these steps:
+
+1. Clone the repository to your local machine.
+
+2. Install the required dependencies by running `pip install -r requirements.txt`.
+
+3. Create a `.env` file in the project's root directory.
+
+4. Add your OpenAI API key to the `.env` file in the following format:
+
+   ```
+   OPENAI_API_KEY=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
+   ```
+
+5. Run the `main.py` script to start the training process and see the GPT-4 model's suggestions for hyperparameter changes.
+
 ## Overview
 
 The project consists of several components:
