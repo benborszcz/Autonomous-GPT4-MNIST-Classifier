@@ -61,15 +61,31 @@ class TrainerAgent():
             print(message['content'])
         print("-----------------------")
         """
-        
-        response = openai.ChatCompletion.create(
-            model=model,
-            messages=self.messages,
-            temperature = temperature,
-            presence_penalty = presence_penalty,
-            frequency_penalty = frequency_penalty,
-            max_tokens = max_tokens
-        )
+
+        max_attempts = 3  # Maximum number of attempts
+        current_attempt = 1  # Current attempt count
+
+        while current_attempt <= max_attempts:
+            response = openai.ChatCompletion.create(
+                model=model,
+                messages=self.messages,
+                temperature=temperature,
+                presence_penalty=presence_penalty,
+                frequency_penalty=frequency_penalty,
+                max_tokens=max_tokens
+            )
+
+            if response['choices'][0]['message']['content']:
+                # If the response is not empty, break out of the loop
+                break
+
+            # Adjust the parameters for the next attempt
+            temperature -= 0.1
+            presence_penalty -= 0.1
+            frequency_penalty -= 0.1
+            max_tokens += 10
+
+            current_attempt += 1
 
         self.clear_messages()
 
