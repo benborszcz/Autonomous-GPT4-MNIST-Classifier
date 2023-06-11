@@ -122,7 +122,7 @@ def test_network(device, network_layers):
     classifier.evaluate()
     print("\n")
 
-def create_network_layers(input_channels, num_conv_layers, num_filters, kernel_size, num_linear_layers, hidden_size, lin_dropout, conv_dropout):
+def create_network_layers(input_channels, num_conv_layers, num_filters, kernel_size, hidden_sizes, lin_dropout, conv_dropout):
     layers = []
 
     # Add convolutional layers
@@ -141,20 +141,20 @@ def create_network_layers(input_channels, num_conv_layers, num_filters, kernel_s
     input_features = out_channels * ((28 - (kernel_size - 1) * num_conv_layers) // 2) ** 2
 
     # Add linear layers
-    for i in range(num_linear_layers):
-        in_features = input_features if i == 0 else hidden_size
-        out_features = hidden_size if i < num_linear_layers - 1 else 10
+    for i in range(len(hidden_sizes)):
+        in_features = input_features if i == 0 else hidden_sizes[i - 1]
+        out_features = hidden_sizes[i] if i < len(hidden_sizes) - 1 else 10
         layers.append({'type': 'Linear', 'in_features': in_features, 'out_features': out_features})
 
         # Add dropout layer if it's not the last linear layer
-        if i < num_linear_layers - 1:
+        if i < len(hidden_sizes) - 1:
             layers.append({'type': 'Dropout', 'p': lin_dropout})
 
     return layers
 
-def autonomous_agent(device, input_channels, num_conv_layers, num_filters, kernel_size, num_linear_layers, hidden_size, lin_dropout, conv_dropout, learning_rate, epochs, batch_size, optimizer):
+def autonomous_agent(device, input_channels, num_filters, kernel_size, hidden_sizes, lin_dropout, conv_dropout, learning_rate, epochs, batch_size, optimizer):
     # Create network layers
-    network_layers = create_network_layers(input_channels, num_conv_layers, num_filters, kernel_size, num_linear_layers, hidden_size, lin_dropout, conv_dropout)
+    network_layers = create_network_layers(input_channels, len(num_filters), num_filters, kernel_size, hidden_sizes, lin_dropout, conv_dropout)
 
     # Create and train the classifier
     classifier = MNISTClassifier(device, network_layers, trainloader, testloader, learning_rate=learning_rate, epochs=epochs, batch_size=batch_size, optimizer=optimizer)
@@ -164,16 +164,16 @@ def autonomous_agent(device, input_channels, num_conv_layers, num_filters, kerne
     classifier.evaluate()
 
 # Test 1: Smaller network with fewer filters in the convolutional layers
-autonomous_agent(device, input_channels=1, num_conv_layers=2, num_filters=[16, 32], kernel_size=3, num_linear_layers=2, hidden_size=64, learning_rate=0.001, epochs=2, batch_size=100, optimizer=optim.SGD, lin_dropout=0.5, conv_dropout=0.25)
+autonomous_agent(device, input_channels=1, num_filters=[16], kernel_size=3, hidden_sizes=[64], learning_rate=0.001, epochs=2, batch_size=100, optimizer=optim.SGD, lin_dropout=0.5, conv_dropout=0.25)
 
 # Test 2: Deeper network with additional convolutional layers
-autonomous_agent(device, input_channels=1, num_conv_layers=4, num_filters=[32, 64, 128, 256], kernel_size=3, num_linear_layers=4, hidden_size=128, learning_rate=0.01, epochs=4, batch_size=100, optimizer=optim.SGD, lin_dropout=0.5, conv_dropout=0.25)
+autonomous_agent(device, input_channels=1, num_filters=[32, 64, 128, 256], kernel_size=3, hidden_sizes=[256,128,64,32], learning_rate=0.01, epochs=4, batch_size=100, optimizer=optim.SGD, lin_dropout=0.5, conv_dropout=0.25)
 
 # Test 3: Network with larger filters in the convolutional layers
-autonomous_agent(device, input_channels=1, num_conv_layers=2, num_filters=[32, 64], kernel_size=5, num_linear_layers=2, hidden_size=128, learning_rate=0.001, epochs=2, batch_size=100, optimizer=optim.SGD, lin_dropout=0.5, conv_dropout=0.25)
+autonomous_agent(device, input_channels=1, num_filters=[32, 64], kernel_size=5, hidden_sizes=[128,64], learning_rate=0.001, epochs=2, batch_size=100, optimizer=optim.SGD, lin_dropout=0.5, conv_dropout=0.25)
 
 # Test 4: Network with more linear layers
-autonomous_agent(device, input_channels=1, num_conv_layers=2, num_filters=[32, 64], kernel_size=3, num_linear_layers=3, hidden_size=128, learning_rate=0.001, epochs=2, batch_size=100, optimizer=optim.SGD, lin_dropout=0.5, conv_dropout=0.25)
+autonomous_agent(device, input_channels=1, num_filters=[32, 64], kernel_size=3, hidden_sizes=[64,16], learning_rate=0.001, epochs=2, batch_size=100, optimizer=optim.SGD, lin_dropout=0.5, conv_dropout=0.25)
 
 # Test 5: Network with fewer linear layers
-autonomous_agent(device, input_channels=1, num_conv_layers=2, num_filters=[32, 64], kernel_size=3, num_linear_layers=1, hidden_size=128, learning_rate=0.001, epochs=2, batch_size=100, optimizer=optim.SGD, lin_dropout=0.5, conv_dropout=0.25)
+autonomous_agent(device, input_channels=1, num_filters=[32, 64], kernel_size=3, hidden_sizes=[128], learning_rate=0.001, epochs=2, batch_size=100, optimizer=optim.SGD, lin_dropout=0.5, conv_dropout=0.25)
