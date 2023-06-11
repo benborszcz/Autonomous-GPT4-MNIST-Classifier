@@ -1,5 +1,19 @@
-# Autonomous-GPT4-MNIST-Classifier
+# Autonomous GPT-4 MNIST Classifier
 
+This project demonstrates an autonomous GPT-4 MNIST classifier that trains a neural network on the MNIST dataset. The GPT-4 model is used to suggest changes to the hyperparameters of the neural network, aiming to improve its performance.
+
+## Overview
+
+The project consists of several components:
+
+1. A custom neural network for classifying MNIST digits.
+2. A training loop that trains the neural network on the MNIST dataset.
+3. An agent that uses the GPT-4 model to suggest changes to the neural network's hyperparameters.
+4. A main script that iteratively trains the neural network and updates its hyperparameters based on the GPT-4 model's suggestions.
+
+## Example Output
+
+The output shows the training progress and the GPT-4 model's suggestions for hyperparameter changes. Here's an example:
 
 ```
 #### PASS 0 ####
@@ -21,7 +35,6 @@ Response: hyperparams = {"num_filters": [64, 128], "kernel_size": 5, "hidden_siz
 Old hyperparameters: {'num_filters': [32, 64], 'kernel_size': 3, 'hidden_sizes': [128, 64], 'learning_rate': 0.01, 'epochs': 4, 'batch_size': 100, 'lin_dropout': 0.5, 'conv_dropout': 0.25}
 Updated hyperparameters: {'num_filters': [64, 128], 'kernel_size': 5, 'hidden_sizes': [256, 128], 'learning_rate': 0.001, 'epochs': 6, 'batch_size': 100, 'lin_dropout': 0.3, 'conv_dropout': 0.2}
 
-
 #### PASS 1 ####
 Epoch 1, Loss: 0.7624234417329232, Accuracy: 0.77315
 Epoch 2, Loss: 0.22502373995880287, Accuracy: 0.9330333333333334
@@ -32,3 +45,5 @@ Epoch 6, Loss: 0.07613769611654182, Accuracy: 0.9773333333333334
 Finished Training
 Accuracy of the network on the 10000 test images: 97.94%
 ```
+
+The GPT-4 model analyzes the training history and suggests changes to the hyperparameters, which are then applied to the neural network. The process continues iteratively, aiming to improve the classifier's performance.
