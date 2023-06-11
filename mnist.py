@@ -76,8 +76,11 @@ class MNISTClassifier:
         criterion = nn.CrossEntropyLoss()
         optimizer = self.optimizer(self.net.parameters(), lr=self.learning_rate, momentum=0.9)
 
+        history = []
         for epoch in range(self.epochs):
             running_loss = 0.0
+            correct = 0
+            total = 0
             for i, data in enumerate(self.trainloader, 0):
                 inputs, labels = data
                 inputs, labels = inputs.to(self.device), labels.to(self.device)
@@ -87,9 +90,17 @@ class MNISTClassifier:
                 loss.backward()
                 optimizer.step()
                 running_loss += loss.item()
-            print(f"Epoch {epoch + 1}, Loss: {running_loss / (i + 1)}")
+                _, predicted = torch.max(outputs.data, 1)
+                total += labels.size(0)
+                correct += (predicted == labels).sum().item()
+
+            epoch_loss = running_loss / (i + 1)
+            epoch_accuracy = correct / total
+            history.append({"epoch": epoch + 1, "loss": epoch_loss, "accuracy": epoch_accuracy})
+            print(f"Epoch {epoch + 1}, Loss: {epoch_loss}, Accuracy: {epoch_accuracy}")
 
         print("Finished Training")
+        return history
 
     def evaluate(self):
         correct = 0
@@ -103,24 +114,10 @@ class MNISTClassifier:
                 total += labels.size(0)
                 correct += (predicted == labels).sum().item()
 
-        print(f"Accuracy of the network on the 10000 test images: {100 * correct / total}%")
+        accuracy = correct / total
+        print(f"Accuracy of the network on the 10000 test images: {100 * accuracy}%")
+        return {"evaluation": 1, "accuracy": accuracy}
 
-
-device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
-print("Using device:", device)
-
-transform = transforms.Compose([transforms.ToTensor(), transforms.Normalize((0.5,), (0.5,))])
-trainset = torchvision.datasets.MNIST(root='./data', train=True, download=True, transform=transform)
-trainloader = torch.utils.data.DataLoader(trainset, batch_size=100, shuffle=True, num_workers=0)
-testset = torchvision.datasets.MNIST(root='./data', train=False, download=True, transform=transform)
-testloader = torch.utils.data.DataLoader(testset, batch_size=100, shuffle=False, num_workers=0)
-
-def test_network(device, network_layers):
-    print(f"Testing network with layers: {network_layers}")
-    classifier = MNISTClassifier(device, network_layers, trainloader, testloader, learning_rate=0.001, epochs=2, batch_size=100, optimizer=optim.SGD)
-    classifier.train()
-    classifier.evaluate()
-    print("\n")
 
 def create_network_layers(input_channels, num_conv_layers, num_filters, kernel_size, hidden_sizes, lin_dropout, conv_dropout):
     layers = []
@@ -152,28 +149,5 @@ def create_network_layers(input_channels, num_conv_layers, num_filters, kernel_s
 
     return layers
 
-def autonomous_agent(device, input_channels, num_filters, kernel_size, hidden_sizes, lin_dropout, conv_dropout, learning_rate, epochs, batch_size, optimizer):
-    # Create network layers
-    network_layers = create_network_layers(input_channels, len(num_filters), num_filters, kernel_size, hidden_sizes, lin_dropout, conv_dropout)
 
-    # Create and train the classifier
-    classifier = MNISTClassifier(device, network_layers, trainloader, testloader, learning_rate=learning_rate, epochs=epochs, batch_size=batch_size, optimizer=optimizer)
-    classifier.train()
 
-    # Evaluate the classifier
-    classifier.evaluate()
-
-# Test 1: Smaller network with fewer filters in the convolutional layers
-autonomous_agent(device, input_channels=1, num_filters=[16], kernel_size=3, hidden_sizes=[64], learning_rate=0.001, epochs=2, batch_size=100, optimizer=optim.SGD, lin_dropout=0.5, conv_dropout=0.25)
-
-# Test 2: Deeper network with additional convolutional layers
-autonomous_agent(device, input_channels=1, num_filters=[32, 64, 128, 256], kernel_size=3, hidden_sizes=[256,128,64,32], learning_rate=0.01, epochs=4, batch_size=100, optimizer=optim.SGD, lin_dropout=0.5, conv_dropout=0.25)
-
-# Test 3: Network with larger filters in the convolutional layers
-autonomous_agent(device, input_channels=1, num_filters=[32, 64], kernel_size=5, hidden_sizes=[128,64], learning_rate=0.001, epochs=2, batch_size=100, optimizer=optim.SGD, lin_dropout=0.5, conv_dropout=0.25)
-
-# Test 4: Network with more linear layers
-autonomous_agent(device, input_channels=1, num_filters=[32, 64], kernel_size=3, hidden_sizes=[64,16], learning_rate=0.001, epochs=2, batch_size=100, optimizer=optim.SGD, lin_dropout=0.5, conv_dropout=0.25)
-
-# Test 5: Network with fewer linear layers
-autonomous_agent(device, input_channels=1, num_filters=[32, 64], kernel_size=3, hidden_sizes=[128], learning_rate=0.001, epochs=2, batch_size=100, optimizer=optim.SGD, lin_dropout=0.5, conv_dropout=0.25)
