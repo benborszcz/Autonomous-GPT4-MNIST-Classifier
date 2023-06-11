@@ -59,7 +59,7 @@ current_hyperparams = {
     "kernel_size": 3,
     "hidden_sizes": [128,64],
     "learning_rate": 0.01,
-    "epochs": 10,
+    "epochs": 4,
     "batch_size": 100,
     "lin_dropout": 0.5,
     "conv_dropout": 0.25,
